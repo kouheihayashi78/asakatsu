@@ -25,6 +25,9 @@ class ProfileUpdateRequest extends FormRequest
                 'max:255',
                 Rule::unique(User::class)->ignore($this->user()->id),
             ],
+            'age' => ['nullable', 'integer', 'min:0', 'max:150'],
+            'target_wake_up_time' => ['nullable', 'date_format:H:i'],
+            'introduction' => ['nullable', 'string', 'max:1000'],
         ];
     }
 }
