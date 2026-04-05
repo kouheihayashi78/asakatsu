@@ -2,40 +2,27 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use Carbon\Carbon;
+use App\Http\Requests\StoreWakeUpRecordRequest;
+use App\Services\WakeUpRecordService;
 
 class WakeUpRecordController extends Controller
 {
-    public function store(Request $request)
+    public function __construct(
+        private WakeUpRecordService $wakeUpRecordService
+    ) {}
+
+    public function store(StoreWakeUpRecordRequest $request)
     {
-        $user = $request->user();
-        $now = Carbon::now();
+        try {
+            $user = $request->user();
+            $this->wakeUpRecordService->recordWakeUp(
+                $user->id,
+                $user->target_wake_up_time
+            );
 
-        // 今日すでに登録しているかチェック
-        $alreadyRecorded = $user->wakeUpRecords()
-            ->whereDate('recorded_at', Carbon::today())
-            ->exists();
-
-        if ($alreadyRecorded) {
-            return back()->withErrors(['message' => '本日の起床記録はすでに登録されています。']);
+            return back();
+        } catch (\RuntimeException $e) {
+            return back()->withErrors(['message' => $e->getMessage()]);
         }
-
-        $isAchieved = false;
-        if ($user->target_wake_up_time) {
-            $targetTime = Carbon::createFromTimeString($user->target_wake_up_time);
-            // 目標時間より前に起きたか判定
-            if ($now->format('H:i:s') <= $targetTime->format('H:i:s')) {
-                $isAchieved = true;
-                $user->increment('wake_up_achievements');
-            }
-        }
-
-        $user->wakeUpRecords()->create([
-            'recorded_at' => $now,
-            'is_achieved' => $isAchieved,
-        ]);
-
-        return back();
     }
 }
