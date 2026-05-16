@@ -1,59 +1,403 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# 早起きできたねっ！アプリケーション
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+早起きを習慣化するためのソーシャル目標達成アプリケーション。目標起床時間を設定し、実際の起床時間を記録・共有することで、モチベーションを維持します。
 
-## About Laravel
+## 技術スタック
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+### バックエンド
+- **PHP**: 8.2+
+- **Laravel**: 12.x
+- **Laravel Breeze**: 認証システム
+- **Inertia.js**: モダンなモノリスアーキテクチャ
+- **Pest**: テストフレームワーク
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+### フロントエンド
+- **React**: 18.x
+- **TypeScript**: 5.x
+- **Tailwind CSS**: 4.x
+- **Vite**: 7.x
+- **Recharts**: データ可視化
+- **Lucide React**: アイコンライブラリ
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+### データベース
+- MySQL / PostgreSQL / SQLite
 
-## Learning Laravel
+## 主な機能
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+### 1. 起床記録
+- ワンクリックで現在時刻を記録
+- 目標時間との比較による達成判定
+- 達成回数の自動カウント
+- 直近1ヶ月の記録一覧表示
+- 起床時間の分布チャート（円グラフ）
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+### 2. ユーザー管理
+- プロフィール編集（名前、年齢、目標起床時間、自己紹介）
+- メール認証
+- パスワード変更
+- アカウント削除
 
-## Laravel Sponsors
+### 3. ソーシャル機能
+- ユーザー一覧表示
+- フォロー/アンフォロー機能
+- フィルタリング
+  - 同じ目標時間のユーザー
+  - フォロー中のユーザー
+- 達成回数順のランキング表示
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+## アーキテクチャ
 
-### Premium Partners
+このアプリケーションは**レイヤードアーキテクチャ**を採用しています。
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+```
+Controller層 (HTTPリクエスト/レスポンス処理)
+    ↓
+Service層 (ビジネスロジック)
+    ↓
+Repository層 (データアクセス)
+    ↓
+Model層 (Eloquent ORM)
+```
 
-## Contributing
+### ディレクトリ構造
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+```
+app/
+├── Http/
+│   ├── Controllers/          # HTTPリクエストハンドリング
+│   │   ├── WakeUpRecordController.php
+│   │   ├── DashboardController.php
+│   │   ├── UserController.php
+│   │   └── FollowController.php
+│   └── Requests/            # フォームリクエストバリデーション
+│       ├── StoreWakeUpRecordRequest.php
+│       └── ProfileUpdateRequest.php
+├── Services/                # ビジネスロジック層
+│   ├── WakeUpRecordService.php
+│   ├── UserService.php
+│   └── FollowService.php
+├── Repositories/            # データアクセス層
+│   ├── WakeUpRecordRepository.php
+│   ├── UserRepository.php
+│   └── FollowRepository.php
+└── Models/                  # Eloquentモデル
+    ├── User.php
+    ├── WakeUpRecord.php
+    └── Follow.php
 
-## Code of Conduct
+resources/js/
+├── Pages/                   # Inertia.jsページコンポーネント
+│   ├── Dashboard.tsx        # ダッシュボード
+│   ├── Users/Index.tsx      # ユーザー一覧
+│   └── Profile/             # プロフィール編集
+├── Components/              # 再利用可能なReactコンポーネント
+├── Layouts/                 # レイアウトコンポーネント
+└── types/                   # TypeScript型定義
+    └── index.d.ts
+```
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+### 設計原則
 
-## Security Vulnerabilities
+- **Constructor Property Promotion**: PHP 8.0+の機能を活用した依存性注入
+- **型安全性**: TypeScriptによる静的型チェック（any型完全排除）
+- **責務の分離**: 各層が明確な役割を持つ
+- **テスタビリティ**: ユニットテスト可能な設計
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+## セットアップ
 
-## License
+### 前提条件
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+- Docker & Docker Compose
+- または以下の環境
+  - PHP 8.2以上
+  - Composer
+  - Node.js 18以上
+  - MySQL/PostgreSQL/SQLite
+
+### Docker（推奨）
+
+```bash
+# 1. リポジトリのクローン
+git clone <repository-url>
+cd asakatsu
+
+# 2. 環境変数の設定
+cp .env.example .env
+
+# 3. Dockerコンテナの起動
+docker compose up -d
+
+# 4. 依存関係のインストール
+docker compose exec laravel.test composer install
+npm install
+
+# 5. アプリケーションキーの生成
+docker compose exec laravel.test php artisan key:generate
+
+# 6. データベースマイグレーション
+docker compose exec laravel.test php artisan migrate
+
+# 7. シードデータの投入（任意）
+docker compose exec laravel.test php artisan db:seed
+
+# 8. フロントエンドのビルド
+npm run build
+```
+
+### ローカル環境
+
+```bash
+# 1. リポジトリのクローン
+git clone <repository-url>
+cd asakatsu
+
+# 2. 環境変数の設定
+cp .env.example .env
+
+# 3. 依存関係のインストール
+composer install
+npm install
+
+# 4. アプリケーションキーの生成
+php artisan key:generate
+
+# 5. データベースマイグレーション
+php artisan migrate
+
+# 6. シードデータの投入（任意）
+php artisan db:seed
+
+# 7. フロントエンドのビルド
+npm run build
+```
+
+### 初期ユーザー
+
+シードデータを投入した場合、以下のテストユーザーでログインできます：
+
+- **Email**: test@example.com
+- **Password**: password
+
+## 開発コマンド
+
+### バックエンド
+
+```bash
+# 開発サーバー起動（すべてのサービスを同時に起動）
+composer dev
+# 内訳: Webサーバー、キューワーカー、ログビューア、Vite
+
+# マイグレーション実行
+php artisan migrate
+
+# マイグレーションのロールバック
+php artisan migrate:rollback
+
+# シードデータ投入
+php artisan db:seed
+
+# キャッシュクリア
+php artisan cache:clear
+php artisan config:clear
+php artisan view:clear
+
+# コード整形（Laravel Pint）
+./vendor/bin/pint
+```
+
+### フロントエンド
+
+```bash
+# 開発サーバー起動（ホットリロード）
+npm run dev
+
+# 本番ビルド
+npm run build
+
+# TypeScriptコンパイルチェック
+npx tsc --noEmit
+
+# ESLint実行（自動修正）
+npm run lint
+```
+
+### テスト
+
+```bash
+# 全テスト実行
+php artisan test
+
+# 特定のテストファイル実行
+php artisan test tests/Unit/Services/WakeUpRecordServiceTest.php
+
+# カバレッジ付きテスト実行
+php artisan test --coverage
+```
+
+### Docker環境の場合
+
+コマンドの前に `docker compose exec laravel.test` を付けます：
+
+```bash
+docker compose exec laravel.test php artisan migrate
+docker compose exec laravel.test php artisan test
+```
+
+## データベーススキーマ
+
+### usersテーブル
+
+| カラム名 | 型 | 説明 |
+|---------|---|------|
+| id | bigint | プライマリキー |
+| name | varchar | ユーザー名 |
+| email | varchar | メールアドレス（ユニーク） |
+| password | varchar | ハッシュ化パスワード |
+| age | integer | 年齢（nullable） |
+| target_wake_up_time | time | 目標起床時間（nullable） |
+| introduction | text | 自己紹介（nullable） |
+| profile_image_path | varchar | プロフィール画像パス（nullable） |
+| wake_up_achievements | integer | 達成回数（デフォルト: 0） |
+| email_verified_at | timestamp | メール確認日時 |
+
+### wake_up_recordsテーブル
+
+| カラム名 | 型 | 説明 |
+|---------|---|------|
+| id | bigint | プライマリキー |
+| user_id | bigint | ユーザーID（外部キー） |
+| recorded_at | datetime | 記録日時 |
+| is_achieved | boolean | 目標達成フラグ |
+| created_at | timestamp | 作成日時 |
+| updated_at | timestamp | 更新日時 |
+
+### followsテーブル
+
+| カラム名 | 型 | 説明 |
+|---------|---|------|
+| id | bigint | プライマリキー |
+| follower_id | bigint | フォローする側のユーザーID（外部キー） |
+| followed_id | bigint | フォローされる側のユーザーID（外部キー） |
+| created_at | timestamp | 作成日時 |
+| updated_at | timestamp | 更新日時 |
+
+※ `[follower_id, followed_id]` の組み合わせにユニーク制約
+
+## API仕様
+
+Inertia.jsを使用しているため、REST APIではなくサーバーサイドレンダリングです。
+
+### 主要ルート
+
+| メソッド | パス | 説明 |
+|---------|------|------|
+| GET | `/dashboard` | ダッシュボード表示 |
+| POST | `/wake-up` | 起床記録登録 |
+| GET | `/users` | ユーザー一覧表示 |
+| POST | `/users/{user}/follow` | フォロー |
+| DELETE | `/users/{user}/follow` | アンフォロー |
+| GET | `/profile` | プロフィール編集画面 |
+| PATCH | `/profile` | プロフィール更新 |
+
+## トラブルシューティング
+
+### vendorディレクトリが壊れている場合
+
+```bash
+# Docker環境
+docker compose exec laravel.test rm -rf vendor composer.lock
+docker compose exec laravel.test composer install
+
+# ローカル環境
+rm -rf vendor composer.lock
+composer install
+```
+
+### npm installでエラーが出る場合
+
+```bash
+rm -rf node_modules package-lock.json
+npm install
+```
+
+### 画面が表示されない場合
+
+```bash
+# キャッシュクリア
+php artisan config:clear
+php artisan cache:clear
+php artisan view:clear
+
+# アセットの再ビルド
+npm run build
+```
+
+### 型エラーが出る場合（TypeScript）
+
+```bash
+# 型定義の確認
+npx tsc --noEmit
+
+# node_modulesの再インストール
+rm -rf node_modules package-lock.json
+npm install
+```
+
+## デプロイ
+
+### 本番環境の設定
+
+1. `.env`ファイルを本番環境用に設定
+   ```
+   APP_ENV=production
+   APP_DEBUG=false
+   APP_URL=https://your-domain.com
+   ```
+
+2. 依存関係のインストール
+   ```bash
+   composer install --optimize-autoloader --no-dev
+   npm install
+   npm run build
+   ```
+
+3. キャッシュの最適化
+   ```bash
+   php artisan config:cache
+   php artisan route:cache
+   php artisan view:cache
+   ```
+
+4. マイグレーション実行
+   ```bash
+   php artisan migrate --force
+   ```
+
+## テスト
+
+### ユニットテスト
+
+```bash
+# Service層のテスト
+php artisan test tests/Unit/Services/
+
+# Repository層のテスト
+php artisan test tests/Unit/Repositories/
+```
+
+### 主要テストケース
+
+- `WakeUpRecordServiceTest`: 起床記録登録のビジネスロジック
+- `UserRepositoryTest`: ユーザーデータアクセス
+
+## 貢献
+
+プルリクエストを歓迎します。大きな変更を行う場合は、まずissueを開いて変更内容を議論してください。
+
+## ライセンス
+
+MIT License
+
+## 作成者
+
+早起き習慣化プロジェクトチーム
