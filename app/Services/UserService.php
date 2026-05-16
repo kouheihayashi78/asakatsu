@@ -24,8 +24,8 @@ class UserService
         // 指定ユーザー以外のクエリ取得
         $query = $this->userRepository->queryExcludingUser($currentUserId);
 
-        // フィルタリング
-        match ($filter) {
+        // フィルタリング（戻り値を$queryに代入することで実際に反映させる）
+        $query = match ($filter) {
             'same_target' => $currentUserTargetTime
                 ? $this->userRepository->filterBySameTargetTime($query, $currentUserTargetTime)
                 : $query,

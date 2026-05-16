@@ -5,6 +5,7 @@ import TextInput from '@/Components/TextInput';
 import { Transition } from '@headlessui/react';
 import { Link, useForm, usePage } from '@inertiajs/react';
 import { FormEventHandler } from 'react';
+import { PageProps } from '@/types';
 
 export default function UpdateProfileInformation({
     mustVerifyEmail,
@@ -15,12 +16,16 @@ export default function UpdateProfileInformation({
     status?: string;
     className?: string;
 }) {
-    const user = usePage().props.auth.user;
+    const { auth } = usePage<PageProps>().props;
+    const user = auth.user;
 
     const { data, setData, patch, errors, processing, recentlySuccessful } =
         useForm({
             name: user.name,
             email: user.email,
+            age: user.age || '',
+            target_wake_up_time: user.target_wake_up_time ? user.target_wake_up_time.substring(0, 5) : '',
+            introduction: user.introduction || '',
         });
 
     const submit: FormEventHandler = (e) => {
@@ -33,17 +38,17 @@ export default function UpdateProfileInformation({
         <section className={className}>
             <header>
                 <h2 className="text-lg font-medium text-gray-900">
-                    Profile Information
+                    プロフィール情報
                 </h2>
 
                 <p className="mt-1 text-sm text-gray-600">
-                    Update your account's profile information and email address.
+                    アカウントのプロフィール情報と目標起床時間を更新します。
                 </p>
             </header>
 
             <form onSubmit={submit} className="mt-6 space-y-6">
                 <div>
-                    <InputLabel htmlFor="name" value="Name" />
+                    <InputLabel htmlFor="name" value="名前" />
 
                     <TextInput
                         id="name"
@@ -59,7 +64,7 @@ export default function UpdateProfileInformation({
                 </div>
 
                 <div>
-                    <InputLabel htmlFor="email" value="Email" />
+                    <InputLabel htmlFor="email" value="メールアドレス" />
 
                     <TextInput
                         id="email"
@@ -74,31 +79,72 @@ export default function UpdateProfileInformation({
                     <InputError className="mt-2" message={errors.email} />
                 </div>
 
+                <div>
+                    <InputLabel htmlFor="age" value="年齢" />
+
+                    <TextInput
+                        id="age"
+                        type="number"
+                        className="mt-1 block w-full"
+                        value={data.age}
+                        onChange={(e) => setData('age', e.target.value)}
+                    />
+
+                    <InputError className="mt-2" message={errors.age} />
+                </div>
+
+                <div>
+                    <InputLabel htmlFor="target_wake_up_time" value="目標起床時間" />
+
+                    <TextInput
+                        id="target_wake_up_time"
+                        type="time"
+                        className="mt-1 block w-full"
+                        value={data.target_wake_up_time}
+                        onChange={(e) => setData('target_wake_up_time', e.target.value)}
+                    />
+
+                    <InputError className="mt-2" message={errors.target_wake_up_time} />
+                </div>
+
+                <div>
+                    <InputLabel htmlFor="introduction" value="自己紹介 / 朝活の目標" />
+
+                    <textarea
+                        id="introduction"
+                        className="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm"
+                        value={data.introduction}
+                        onChange={(e) => setData('introduction', e.target.value)}
+                        rows={4}
+                    />
+
+                    <InputError className="mt-2" message={errors.introduction} />
+                </div>
+
                 {mustVerifyEmail && user.email_verified_at === null && (
                     <div>
                         <p className="mt-2 text-sm text-gray-800">
-                            Your email address is unverified.
+                            メールアドレスが未確認です。
                             <Link
                                 href={route('verification.send')}
                                 method="post"
                                 as="button"
                                 className="rounded-md text-sm text-gray-600 underline hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
                             >
-                                Click here to re-send the verification email.
+                                確認メールを再送信するにはここをクリックしてください。
                             </Link>
                         </p>
 
                         {status === 'verification-link-sent' && (
                             <div className="mt-2 text-sm font-medium text-green-600">
-                                A new verification link has been sent to your
-                                email address.
+                                新しい確認リンクがあなたのメールアドレスに送信されました。
                             </div>
                         )}
                     </div>
                 )}
 
                 <div className="flex items-center gap-4">
-                    <PrimaryButton disabled={processing}>Save</PrimaryButton>
+                    <PrimaryButton disabled={processing}>保存</PrimaryButton>
 
                     <Transition
                         show={recentlySuccessful}
@@ -108,7 +154,7 @@ export default function UpdateProfileInformation({
                         leaveTo="opacity-0"
                     >
                         <p className="text-sm text-gray-600">
-                            Saved.
+                            保存しました。
                         </p>
                     </Transition>
                 </div>

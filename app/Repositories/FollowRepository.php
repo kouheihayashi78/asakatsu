@@ -12,10 +12,12 @@ class FollowRepository
      */
     public function follow(int $followerId, int $followedId): void
     {
-        $follower = User::find($followerId);
-        if ($follower && $followerId !== $followedId) {
-            $follower->following()->syncWithoutDetaching([$followedId]);
+        if ($followerId === $followedId) {
+            return;
         }
+
+        $follower = User::findOrFail($followerId);
+        $follower->following()->syncWithoutDetaching([$followedId]);
     }
 
     /**
@@ -23,10 +25,8 @@ class FollowRepository
      */
     public function unfollow(int $followerId, int $followedId): void
     {
-        $follower = User::find($followerId);
-        if ($follower) {
-            $follower->following()->detach($followedId);
-        }
+        $follower = User::findOrFail($followerId);
+        $follower->following()->detach($followedId);
     }
 
     /**
@@ -34,7 +34,7 @@ class FollowRepository
      */
     public function getFollowingIds(int $userId): Collection
     {
-        return User::find($userId)->following()->pluck('followed_id');
+        return User::findOrFail($userId)->following()->pluck('followed_id');
     }
 
     /**

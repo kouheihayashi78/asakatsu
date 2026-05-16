@@ -1,5 +1,5 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import { Head, Link, useForm, router } from '@inertiajs/react';
+import { Head, router } from '@inertiajs/react';
 import { UserPlus, UserMinus, CheckCircle, Search } from 'lucide-react';
 
 interface User {
@@ -134,14 +134,15 @@ export default function UsersIndex({ users, filters, currentUserTargetTime }: Pr
                     {/* ページネーション */}
                     {users.links.length > 3 && (
                         <div className="flex justify-center space-x-1 mt-6">
-                            {users.links.map((link, i) => (
+                            {users.links.map((link) => (
                                 <button
-                                    key={i}
+                                    key={link.label}
                                     onClick={() => link.url && router.get(link.url, { filter: filters.filter }, { preserveState: true })}
                                     disabled={!link.url}
                                     className={`px-4 py-2 border rounded-md text-sm ${link.active ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-white text-gray-700 hover:bg-gray-50'} ${!link.url ? 'opacity-50 cursor-not-allowed' : ''}`}
-                                    dangerouslySetInnerHTML={{ __html: link.label }}
-                                />
+                                >
+                                    {link.label.replace('&laquo; ', '« ').replace(' &raquo;', ' »')}
+                                </button>
                             ))}
                         </div>
                     )}
