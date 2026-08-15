@@ -2,8 +2,8 @@
 
 namespace App\Services;
 
-use App\Repositories\UserRepository;
 use App\Repositories\FollowRepository;
+use App\Repositories\UserRepository;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 class UserService
@@ -27,7 +27,7 @@ class UserService
         // フィルタリング（戻り値を$queryに代入することで実際に反映させる）
         $query = match ($filter) {
             'same_target' => $currentUserTargetTime
-                ? $this->userRepository->filterBySameTargetTime($query, $currentUserTargetTime)
+                ? $this->userRepository->filterBySameTargetHour($query, $currentUserTargetTime)
                 : $query,
             'following' => $this->userRepository->filterByFollowing($query, $currentUserId),
             default => $query,

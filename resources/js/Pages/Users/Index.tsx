@@ -32,6 +32,10 @@ interface Props {
 }
 
 export default function UsersIndex({ users, filters, currentUserTargetTime }: Props) {
+    const currentUserTargetHour = currentUserTargetTime
+        ? Number.parseInt(currentUserTargetTime.split(':')[0], 10)
+        : null;
+
     const handleFilterChange = (filter: string) => {
         router.get(route('users.index'), { filter }, { preserveState: true });
     };
@@ -67,7 +71,11 @@ export default function UsersIndex({ users, filters, currentUserTargetTime }: Pr
                             className={`px-4 py-2 rounded-full font-bold text-sm ${!currentUserTargetTime ? 'opacity-50 cursor-not-allowed' : filters.filter === 'same_target' ? 'bg-indigo-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}
                             title={!currentUserTargetTime ? 'プロフィール設定で目標起床時間を設定してください' : ''}
                         >
-                            同じ目標時間 ({currentUserTargetTime || '未設定'})
+                            同じ目標時間帯（
+                            {currentUserTargetHour !== null
+                                ? `${currentUserTargetHour}時台`
+                                : '未設定'}
+                            ）
                         </button>
                         <button
                             onClick={() => handleFilterChange('following')}

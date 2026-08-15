@@ -31,15 +31,22 @@ class UserRepositoryTest extends TestCase
         $this->assertEquals($otherUser->id, $users->first()->id);
     }
 
-    public function test_filter_by_same_target_time(): void
+    public function test_filter_by_same_target_hour(): void
     {
-        User::factory()->create(['target_wake_up_time' => '06:00:00']);
+        $atStart = User::factory()->create(['target_wake_up_time' => '06:00:00']);
+        $withinHour = User::factory()->create(['target_wake_up_time' => '06:59:59']);
+        User::factory()->create(['target_wake_up_time' => '05:59:59']);
         User::factory()->create(['target_wake_up_time' => '07:00:00']);
+        User::factory()->create(['target_wake_up_time' => null]);
 
         $query = User::query();
-        $filteredQuery = $this->repository->filterBySameTargetTime($query, '06:00:00');
+        $users = $this->repository
+            ->filterBySameTargetHour($query, '06:30:00')
+            ->get();
 
-        $this->assertCount(1, $filteredQuery->get());
+        $this->assertCount(2, $users);
+        $this->assertTrue($users->contains($atStart));
+        $this->assertTrue($users->contains($withinHour));
     }
 
     public function test_increment_achievements(): void

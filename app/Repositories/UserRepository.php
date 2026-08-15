@@ -3,9 +3,9 @@
 namespace App\Repositories;
 
 use App\Models\User;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Carbon\Carbon;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Database\Eloquent\Builder;
 
 class UserRepository
 {
@@ -21,11 +21,17 @@ class UserRepository
     }
 
     /**
-     * 同じ目標時間のユーザーでフィルタ
+     * 同じ目標時間帯（1時間単位）のユーザーでフィルタ
      */
-    public function filterBySameTargetTime(Builder $query, string $targetTime): Builder
+    public function filterBySameTargetHour(Builder $query, string $targetTime): Builder
     {
-        return $query->where('target_wake_up_time', $targetTime);
+        $startOfHour = Carbon::createFromTimeString($targetTime)->startOfHour();
+        $endOfHour = $startOfHour->copy()->endOfHour();
+
+        return $query->whereBetween('target_wake_up_time', [
+            $startOfHour->format('H:i:s'),
+            $endOfHour->format('H:i:s'),
+        ]);
     }
 
     /**
